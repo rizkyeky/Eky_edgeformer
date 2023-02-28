@@ -7,8 +7,8 @@ common:
   mixed_precision: true
   results_loc: "/content/drive/MyDrive/skripsi/result/detection_krsbi/edgeformer-s"
 dataset:
-  root_train: "/content/drive/MyDrive/skripsi/imgs_dec/run_1_balance/train"
-  root_val: "/content/drive/MyDrive/skripsi/imgs_dec/run_1_balance/val"
+  root_train: "/content/drive/MyDrive/skripsi/imgs_dec/balance"
+  root_val: "/content/drive/MyDrive/skripsi/imgs_dec/balance"
   name: "krsbi_ssd"
   category: "detection"
   train_batch_size0: 64
