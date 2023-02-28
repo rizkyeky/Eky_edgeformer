@@ -55,9 +55,9 @@ model:
       size_variance: 0.2
       iou_threshold: 0.5
       nms_iou_threshold: 0.5
-    pretrained: "parcnet/pretrained_models/detection/checkpoint_last_krsbi.pt"
-    n_classes: 81
-    last_classes: 3
+    pretrained: "parcnet/pretrained_models/detection/checkpoint_last_krsbi_run1.pt"
+    n_classes: 4
+    # last_classes: 3
   classification:
     name: "edgeformer"
     classifier_dropout: 0.2

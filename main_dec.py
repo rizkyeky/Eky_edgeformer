@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # with open('labels/ms_coco_81_classes.json') as f:
     #     CLASSES = json.load(f)
     
-    CLASSES = ['robot', 'ball', 'goal']
+    CLASSES = ['_', 'robot', 'ball', 'goal']
     
     COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
     COLORS = COLORS.astype(np.uint8)
@@ -41,16 +41,10 @@ if __name__ == "__main__":
 
     img_transforms = transforms.Compose([
         transforms.Resize((res_h, res_w)),
-        # transforms.CenterCrop(224),
         transforms.ToTensor(),
-        # transforms.Normalize(
-        #     [0.485, 0.456, 0.406],
-        #     [0.229, 0.224, 0.225]
-        # )
     ])
 
     model = get_model(opts)
-    print(model)
     model.to(device)
     model.eval()
 
@@ -59,7 +53,7 @@ if __name__ == "__main__":
     
     with torch.no_grad():
 
-        img_path = 'images_test/krsbi5.jpg'
+        img_path = 'images_test/krsbi4.jpg'
         image = Image.open(img_path)
         orig = image.copy()
         draw = ImageDraw.Draw(orig)
@@ -96,12 +90,11 @@ if __name__ == "__main__":
         boxes = boxes.astype(np.uint32)
 
         for idx, score, coords in zip(labels, scores, boxes):
-            idx = idx - 1
             label = "{}: {:.2f}%".format(CLASSES[idx], score * 100)
             startX, startY, endX, endY = coords
             print('label:', label)
             print('coords:', (startX, startY, endX, endY))
-            if score > 0.2:
+            if score > 0.05:
                 draw.rectangle(
                     [(startX, startY), (endX, endY)],
                     outline=tuple(COLORS[idx]),

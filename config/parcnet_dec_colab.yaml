@@ -11,10 +11,10 @@ dataset:
   root_val: "/content/drive/MyDrive/skripsi/imgs_dec"
   name: "krsbi_ssd"
   category: "detection"
-  train_batch_size0: 32
-  val_batch_size0: 32
+  train_batch_size0: 64
+  val_batch_size0: 64
   eval_batch_size0: 1
-  workers: 2
+  workers: 8
   persistent_workers: false
   pin_memory: true
 sampler:
@@ -38,7 +38,7 @@ optim:
 scheduler:
   name: "cosine"
   is_iteration_based: false
-  max_epochs: 20
+  max_epochs: 100
   warmup_iterations: 500
   warmup_init_lr: 0.00009
   cosine:
@@ -56,7 +56,7 @@ model:
       iou_threshold: 0.5
       nms_iou_threshold: 0.5
     pretrained: "parcnet/pretrained_models/detection/checkpoint_ema_avg_num3.pt"
-    n_classes: 3
+    n_classes: 4
   classification:
     name: "edgeformer"
     classifier_dropout: 0.2

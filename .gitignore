@@ -1,1 +1,2 @@
-parcnet/pretrained_models/classification/checkpoint_ema_avg.pt
+parcnet/pretrained_models/
+images_test/
