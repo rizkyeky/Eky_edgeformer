@@ -65,7 +65,8 @@ def create_train_val_loader(opts):
                               num_workers=data_workers,
                               pin_memory=pin_memory,
                               batch_sampler=train_sampler,
-                              persistent_workers=persistent_workers
+                              persistent_workers=persistent_workers,
+                            #   shuffle=True
                               )
 
     val_loader = DataLoader(dataset=valid_dataset,
@@ -73,7 +74,8 @@ def create_train_val_loader(opts):
                             batch_sampler=valid_sampler,
                             num_workers=data_workers,
                             pin_memory=pin_memory,
-                            persistent_workers=persistent_workers
+                            persistent_workers=persistent_workers,
+                            # shuffle=True
                             )
 
     # if is_master_node:
