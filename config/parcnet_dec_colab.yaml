@@ -98,3 +98,6 @@ image_augmentation:
     enable: True
   random_gauss_noise:
     enable: True
+evaluation:
+  detection:
+    mode: "image_folder"
