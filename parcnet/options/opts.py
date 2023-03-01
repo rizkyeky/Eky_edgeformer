@@ -146,7 +146,7 @@ def get_detection_eval_arguments():
     group.add_argument("--evaluation.detection.save-overlay-boxes", action="store_true",
                        help="enable this flag to visualize predicted masks on top of input image")
     group.add_argument("--evaluation.detection.mode", type=str, default="validation_set", required=True,
-                       choices=["single_image", "image_folder", "validation_set"],
+                       choices=["single_image", "image_folder", "validation_set", "test_set"],
                        help="Contribution of mask when overlaying on top of RGB image. ")
     group.add_argument("--evaluation.detection.path", type=str, default=None,
                        help="Path of the image or image folder (only required for single_image and image_folder modes)")

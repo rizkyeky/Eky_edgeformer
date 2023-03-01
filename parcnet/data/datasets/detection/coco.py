@@ -321,7 +321,7 @@ class KRSBIDetection(BaseImageDataset):
     def __init__(self, opts, is_training: Optional[bool] = True, is_evaluation: Optional[bool] = False):
         super(KRSBIDetection, self).__init__(opts=opts, is_training=is_training, is_evaluation=is_evaluation)
 
-        split = 'train' if is_training else 'val'
+        split = 'train' if is_training else ('test' if is_evaluation else 'val')
         ann_file = os.path.join(self.root, 'annotations/{}.json'.format(split))
         self.coco = COCO(ann_file)
         self.img_dir = os.path.join(self.root, 'images/{}'.format(split))
@@ -387,7 +387,7 @@ class KRSBIDetection(BaseImageDataset):
         }
 
         del data
-
+        
         if self.is_evaluation:
             new_data["file_name"] = img_name
             new_data["im_width"] = im_width

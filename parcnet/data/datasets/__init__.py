@@ -50,6 +50,7 @@ def evaluation_datasets(opts):
 
     name_dataset_task = dataset_name + "_" + dataset_category
     eval_dataset = None
+    print(name_dataset_task)
     if name_dataset_task in DATASET_REGISTRY:
         eval_dataset = DATASET_REGISTRY[name_dataset_task](opts=opts, is_training=False, is_evaluation=True)
     else:

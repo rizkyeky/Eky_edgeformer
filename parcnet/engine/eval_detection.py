@@ -17,7 +17,7 @@ from common import SUPPORTED_IMAGE_EXTNS
 from options.opts import get_detection_eval_arguments
 from cvnets import get_model
 from cvnets.models.detection.ssd import DetectionPredTuple
-from data import create_eval_loader
+from data import create_eval_loader, create_test_loader
 from data.datasets.dataset_base import BaseImageDataset
 from data.datasets.detection.coco import COCO_CLASS_LIST as object_names
 from utils.tensor_utils import to_numpy, tensor_size_from_opts
@@ -40,7 +40,7 @@ def predict_and_save(opts,
                      input_tensor: Tensor,
                      model: nn.Module,
                      input_arr: Optional[np.ndarray] = None,
-                     device: Optional = torch.device("cpu"),
+                     device: Optional[torch.device] = torch.device("cpu"),
                      mixed_precision_training: Optional[bool] = False,
                      is_validation: Optional[bool] = False,
                      file_name: Optional[str] = None,
@@ -118,12 +118,13 @@ def predict_and_save(opts,
         logger.log("Detection results stored at: {}".format(res_fname))
 
 
-def predict_labeled_dataset(opts, **kwargs):
+def predict_labeled_dataset(opts, split, **kwargs):
     device = getattr(opts, "dev.device", torch.device('cpu'))
 
     # set-up data loaders
-    val_loader = create_eval_loader(opts)
-
+    loader = create_eval_loader(opts)
+    if split == 'test':
+        loader = create_test_loader(opts)
     # set-up the model
     model = get_model(opts)
     model.eval()
@@ -138,12 +139,13 @@ def predict_labeled_dataset(opts, **kwargs):
 
     with torch.no_grad():
         predictions = {}
-        for img_idx, batch in tqdm(enumerate(val_loader)):
+        for img_idx, batch in tqdm(enumerate(loader)):
             input_img, target_label = batch['image'], batch['label']
 
             batch_size = input_img.shape[0]
             assert batch_size == 1, "We recommend to run segmentation evaluation with a batch size of 1"
 
+            print(batch.keys())
             orig_w = batch["im_width"][0].item()
             orig_h = batch["im_height"][0].item()
 
@@ -161,7 +163,7 @@ def predict_labeled_dataset(opts, **kwargs):
             predictions[img_idx] = (img_idx, boxes, labels, scores)
         predictions = [predictions[i] for i in predictions.keys()]
 
-        compute_quant_scores(opts=opts, predictions=predictions)
+        compute_quant_scores(opts=opts, predictions=predictions, split=split, output_dir='krsbi_eval')
 
 
 def predict_image(opts, image_fname, **kwargs):
@@ -347,7 +349,9 @@ def main_detection_evaluation(**kwargs):
     elif eval_mode == "validation_set":
         # evaluate and compute stats for labeled image dataset
         # This is useful for generating results for validation set and compute quantitative results
-        predict_labeled_dataset(opts=opts, **kwargs)
+        predict_labeled_dataset(opts, 'val', **kwargs)
+    elif eval_mode == "test_set":
+        predict_labeled_dataset(opts, 'test', **kwargs)
     else:
         logger.error(
             "Supported modes are single_image, image_folder, and validation_set. Got: {}".format(eval_mode)

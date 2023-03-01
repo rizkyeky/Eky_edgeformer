@@ -1,20 +1,21 @@
 common:
-  run_label: "run_1"
+  run_label: "run_1_balance_eval"
   accum_freq: 1
   accum_after_epoch: -1
   log_freq: 500
   auto_resume: true
   mixed_precision: true
-  results_loc: "/Users/eky/Documents/_SKRIPSI/code/result/detection_coco/edgeformer-s"
+  results_loc: "/Users/eky/Documents/_SKRIPSI/code/result/detection_krsbi/edgeformer-s"
 dataset:
-  root_train: "/Users/eky/Documents/_SKRIPSI/code/imgs_dec"
-  root_val: "/Users/eky/Documents/_SKRIPSI/code/imgs_dec"
-  name: "krsbi_ssd"
+  root_train: "/Users/eky/Documents/_SKRIPSI/_dataset/_balance"
+  root_val: "/Users/eky/Documents/_SKRIPSI/_dataset/_balance"
+  root_test: "/Users/eky/Documents/_SKRIPSI/_dataset/_balance"
+  name: "krsbi"
   category: "detection"
-  train_batch_size0: 32
-  val_batch_size0: 32
+  train_batch_size0: 64
+  val_batch_size0: 64
   eval_batch_size0: 1
-  workers: 2
+  workers: 8
   persistent_workers: false
   pin_memory: true
 sampler:
@@ -38,7 +39,7 @@ optim:
 scheduler:
   name: "cosine"
   is_iteration_based: false
-  max_epochs: 20
+  max_epochs: 100
   warmup_iterations: 500
   warmup_init_lr: 0.00009
   cosine:
@@ -55,7 +56,7 @@ model:
       size_variance: 0.2
       iou_threshold: 0.5
       nms_iou_threshold: 0.5
-    pretrained: "parcnet/pretrained_models/detection/checkpoint_ema_avg_num.pt"
+    pretrained: "parcnet/pretrained_models/detection/checkpoint_ema_avg_modif.pt"
     n_classes: 4
   classification:
     name: "edgeformer"
@@ -93,3 +94,12 @@ stats:
   name: [ "loss" ]
   checkpoint_metric: "loss"
   checkpoint_metric_max: false
+image_augmentation:
+  random_horizontal_flip: 
+    enable: True
+  random_gauss_noise:
+    enable: True
+# evaluation:
+#   detection:
+#     mode: "image_folder"
+#     path: "/content/drive/MyDrive/skripsi/imgs_dec/balance/images/test"

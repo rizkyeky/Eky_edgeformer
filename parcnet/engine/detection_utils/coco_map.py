@@ -14,8 +14,8 @@ def coco_evaluation(opts,
                     year: Optional[int] = 2017,
                     iou_type: Optional[str] = "bbox") -> None:
     coco_results = []
-    root = getattr(opts, "dataset.root_val", None)
-    ann_file = os.path.join(root, 'annotations/instances_{}{}.json'.format(split, year))
+    root = getattr(opts, "dataset.root_{}".format(split), None)
+    ann_file = os.path.join(root, 'annotations/{}.json'.format(split))
     coco = COCO(ann_file)
 
     coco_categories = sorted(coco.getCatIds())
@@ -66,10 +66,12 @@ def coco_evaluation(opts,
 
 
 def compute_quant_scores(opts,
-                         predictions: List,
-                         output_dir: Optional[str] = "coco_eval_results", *args, **kwargs) -> None:
+                        predictions: List,
+                        output_dir: Optional[str] = "coco_eval_results",
+                        split: Optional[str] = "val",
+                        *args, **kwargs) -> None:
     dataset_name = getattr(opts, "dataset.name", None)
-    if dataset_name.find("coco") > -1:
-        coco_evaluation(opts=opts, predictions=predictions, output_dir=output_dir)
+    if dataset_name.find("coco") > -1 or dataset_name.find("krsbi") > -1:
+        coco_evaluation(opts=opts, predictions=predictions, output_dir=output_dir, split=split)
     else:
         raise NotImplementedError
