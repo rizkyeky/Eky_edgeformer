@@ -3,9 +3,9 @@ import time
 import platform
 
 if str(platform.platform()).startswith('macOS'):
-    sys.argv.extend(['--common.config-file', 'config/parcnet_dec.yaml'])
+    sys.argv.extend(['--common.config-file', 'config/parcnet_dec_train.yaml'])
 else:
-    sys.argv.extend(['--common.config-file', 'config/parcnet_dec_colab.yaml'])
+    sys.argv.extend(['--common.config-file', 'config/parcnet_dec_colab_train_unbalance.yaml'])
 
 sys.path.append('parcnet')
 from parcnet.data import *

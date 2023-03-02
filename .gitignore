@@ -1,3 +1,5 @@
-parcnet/pretrained_models/detection/checkpoint_last_krsbi_run1.pt
+parcnet/pretrained_models/detection/checkpoint_last_krsbi_run1_81.pt
 parcnet/pretrained_models/detection/checkpoint_ema_avg_modif.pt
+parcnet/pretrained_models/detection/checkpoint_ema_avg_balance_4_run1.pt
+parcnet/pretrained_models/detection/checkpoint_ema_best_balance_4_run1.pt
 images_test/
