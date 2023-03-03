@@ -22,43 +22,33 @@ import json
 
 from PIL import Image, ImageDraw
 
-if __name__ == "__main__":
-    
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
-    opts = get_eval_arguments()
-    opts = device_setup(opts)
+opts = get_eval_arguments()
+opts = device_setup(opts)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # with open('labels/ms_coco_81_classes.json') as f:
-    #     CLASSES = json.load(f)
-    
-    CLASSES = ['_', 'robot', 'ball', 'goal']
-    
-    COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
-    COLORS = COLORS.astype(np.uint8)
-    
-    res_h, res_w = tensor_size_from_opts(opts)
+res_h, res_w = tensor_size_from_opts(opts)
+img_transforms = transforms.Compose([
+    transforms.ToPILImage(),
+    transforms.Resize((res_h, res_w)),
+    transforms.ToTensor(),
+])
 
-    img_transforms = transforms.Compose([
-        transforms.Resize((res_h, res_w)),
-        transforms.ToTensor(),
-    ])
-
+def init_model():    
     model = get_model(opts)
     model.to(device)
-    model.eval()
+    # model.eval()
 
-    if model.training:
-        model.eval()
+    # if model.training:
+    #     model.eval()
+    
+    return model
+
+
+def predict_image(model, image):
     
     with torch.no_grad():
-
-        img_path = 'images_test/krsbi4.jpg'
-        image = Image.open(img_path)
-        orig = image.copy()
-        draw = ImageDraw.Draw(orig)
-        
-        orig_h, orig_w = orig.size[1], orig.size[0]
+        image = np.array(image)
+        orig_h, orig_w = image.shape[0], image.shape[1]
         
         image = img_transforms(image)
         image = image.unsqueeze(0)
@@ -76,7 +66,7 @@ if __name__ == "__main__":
         mixed_precision_training = getattr(opts, "common.mixed_precision", False)
         with autocast(enabled=mixed_precision_training if torch.cuda.is_available() else False):
             img = image.cuda() if torch.cuda.is_available() else image.cpu()
-            prediction: DetectionPredTuple = model.predict(img, is_scaling=False)
+            prediction: DetectionPredTuple = model.predict(img, is_scaling=True)
         
         boxes = prediction.boxes.cpu().numpy()
         labels = prediction.labels.cpu().numpy()
@@ -89,22 +79,42 @@ if __name__ == "__main__":
 
         boxes = boxes.astype(np.uint32)
 
-        for idx, score, coords in zip(labels, scores, boxes):
-            label = "{}: {:.2f}%".format(CLASSES[idx], score * 100)
-            startX, startY, endX, endY = coords
-            print('label:', label)
-            print('coords:', (startX, startY, endX, endY))
-            if score > 0.05:
-                draw.rectangle(
-                    [(startX, startY), (endX, endY)],
-                    outline=tuple(COLORS[idx]),
-                    width=3
-                )
-                y = startY - 15 if startY - 15 > 15 else startY + 15
-                draw.text((startX, y), label, tuple(COLORS[idx]))
-
-        orig.show()
+    return labels, scores, boxes
         
+if __name__ == '__main__':
+
+    # with open('labels/ms_coco_81_classes.json') as f:
+    #     CLASSES = json.load(f)
+
+    model = init_model()
+
+    torch.onnx.export(model, torch.randn(1, 3, 224, 224), "parcnet.onnx")
     
+    # CLASSES = ['_', 'robot', 'ball', 'goal']
     
+    # COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
+    # COLORS = COLORS.astype(np.uint8)
+
+    # img_path = 'images_test/krsbi1.jpg'
+    # image = Image.open(img_path)
+    # orig = image.copy()
+    # draw = ImageDraw.Draw(orig)
+    
+    # labels, scores, boxes = predict_image(image)
+
+    # for idx, score, coords in zip(labels, scores, boxes):
+    #     if score > 0.2:
+    #         label = "{}: {:.2f}%".format(CLASSES[idx], score * 100)
+    #         startX, startY, endX, endY = coords
+    #         # print('label:', label)
+    #         # print('coords:', (startX, startY, endX, endY))
+    #         draw.rectangle(
+    #             [(startX, startY), (endX, endY)],
+    #             outline=tuple(COLORS[idx]),
+    #             width=3
+    #         )
+    #         y = startY - 15 if startY - 15 > 15 else startY + 15
+    #         draw.text((startX, y), label, tuple(COLORS[idx]))
+
+    # orig.show()
     
