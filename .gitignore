@@ -5,3 +5,5 @@ images_test/
 
 parcnet/pretrained_models/detection/checkpoint_ema_avg_modif.pt
 parcnet/pretrained_models/detection/checkpoint_last_krsbi_run1_81.pt
+examples/yolov8n.onnx
+yolov8n.pt

@@ -4,15 +4,19 @@ import torchvision.transforms as transforms
 import numpy as np
 import torch
 import cv2
+from ultralytics import YOLO
 
-from PIL import Image, ImageDraw
 
-data_transforms = transforms.Compose([
-    transforms.ToTensor(),
-])
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# data_transforms = transforms.Compose([
+#     transforms.ToTensor(),
+# ])
+# DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def init_model():
+
+    # Load a model
+    # model = YOLO("examples/yolov8n.onnx")
+    
     # model = detection.fasterrcnn_mobilenet_v3_large_320_fpn(
     #     weights='COCO_V1',
     #     progress=True,
@@ -24,21 +28,25 @@ def init_model():
         weights_backbone='IMAGENET1K_V1',
     )
 
-    model.to(DEVICE)
-    model.eval()
+    # model.to(DEVICE)
+    # model.eval()
     return model
 
 def predict_image(model, image):
 
-    image = np.array(image)
+    # image = np.array(image)
     
-    image = data_transforms(image)
-    image = image.unsqueeze(0)
-    image.to(DEVICE)
+    # image = data_transforms(image)
+    # image = image.unsqueeze(0)
+    # image.to(DEVICE)
 
-    outputs = model(image)[0]
+    outputs = model(image)
     
-    return outputs["labels"], outputs["scores"], outputs["boxes"]
+    boxes = outputs[0].boxes
+    labels = boxes.cls
+    scores = boxes.conf
+    
+    return labels, scores, boxes
 
 if __name__ == "__main__":
 
@@ -47,7 +55,7 @@ if __name__ == "__main__":
     if (cap.isOpened()== False): 
         print("Error opening video stream or file")
 
-    with open('labels/ms_coco_91_classes.json') as f:
+    with open('labels/ms_coco_81_classes.json') as f:
         CLASSES = json.load(f)
     
     COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
@@ -70,9 +78,8 @@ if __name__ == "__main__":
             for box, label, score in zip(boxes, labels, scores):
         
                 if score > 0.5:
-                    idx = int(label)-1
-                    box = box.detach().cpu().numpy()
-                    (startX, startY, endX, endY) = box.astype("uint16")
+                    idx = int(label)+1
+                    (startX, startY, endX, endY) = box.xyxy.numpy().squeeze().astype("uint16")
                     
                     text = "{}: {:.2f}%".format(CLASSES[str(idx)], score * 100)
                     cv2.rectangle(frame,
@@ -86,7 +93,7 @@ if __name__ == "__main__":
             time_diff = (t2 - t1) / cv2.getTickFrequency()
             fps = 1 / time_diff
             fps_list.append(fps)
-            print(np.mean(fps_list))
+            print('{:.2f}'.format(np.mean(fps_list)))
 
             cv2.putText(frame,'FPS: {:.2f}'.format(fps), (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
 
