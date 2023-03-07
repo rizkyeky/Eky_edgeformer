@@ -93,7 +93,7 @@ if __name__ == "__main__":
             time_diff = (t2 - t1) / cv2.getTickFrequency()
             fps = 1 / time_diff
             fps_list.append(fps)
-            print('{:.2f}'.format(np.mean(fps_list)))
+            print('{xx:.2f}'.format(np.mean(fps_list)))
 
             cv2.putText(frame,'FPS: {:.2f}'.format(fps), (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
 

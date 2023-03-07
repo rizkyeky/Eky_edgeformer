@@ -33,25 +33,54 @@ img_transforms = transforms.Compose([
     transforms.ToTensor(),
 ])
 
+img_pil_transforms = transforms.Compose([
+    transforms.Resize((res_h, res_w)),
+    transforms.ToTensor(),
+])
+
 def init_model():    
     model = get_model(opts)
     model.to(device)
-    # model.eval()
+    model.eval()
 
-    # if model.training:
-    #     model.eval()
+    if model.training:
+        model.eval()
     
     return model
 
+def predict_image_batch(model, batch, _dir):
 
-def predict_image(model, image):
+    images = []
+    for file in batch:
+        image = Image.open(_dir + '/' + file)
+        image = img_pil_transforms(image)
+        image = image.cpu().numpy()
+        images.append(image)
+
+    labels_batch = []
+    scores_batch = []
+    boxes_batch = []
+
+    for i, img in enumerate(images):
+        labels, scores, boxes = predict_image(model, img, is_batch=True)
+        labels_batch.append(labels)
+        scores_batch.append(scores)
+        boxes_batch.append(boxes)
+    
+    return labels_batch, scores_batch, boxes_batch
+
+def predict_image(model, image, is_batch=False):
     
     with torch.no_grad():
         image = np.array(image)
         orig_h, orig_w = image.shape[0], image.shape[1]
         
-        image = img_transforms(image)
-        image = image.unsqueeze(0)
+        if is_batch:
+            image = torch.from_numpy(image)
+            image = image.unsqueeze(0)
+        else:
+            image = img_transforms(image)
+            image = image.unsqueeze(0)
 
         output_stride = 32
         curr_height, curr_width = image.shape[2:]
@@ -77,18 +106,18 @@ def predict_image(model, image):
         boxes[..., 0::2] = np.clip(a_min=0, a_max=orig_w, a=boxes[..., 0::2])
         boxes[..., 1::2] = np.clip(a_min=0, a_max=orig_h, a=boxes[..., 1::2])
 
-        boxes = boxes.astype(np.uint32)
-
+        boxes = boxes.astype(np.int16)
+        
     return labels, scores, boxes
         
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
     # with open('labels/ms_coco_81_classes.json') as f:
     #     CLASSES = json.load(f)
 
-    model = init_model()
+    # model = init_model()
 
-    torch.onnx.export(model, torch.randn(1, 3, 224, 224), "parcnet.onnx")
+    # torch.onnx.export(model, torch.randn(1, 3, 224, 224), "parcnet.onnx")
     
     # CLASSES = ['_', 'robot', 'ball', 'goal']
     
