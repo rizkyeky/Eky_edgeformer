@@ -55,9 +55,10 @@ model:
       size_variance: 0.2
       iou_threshold: 0.5
       nms_iou_threshold: 0.5
-    # pretrained: "parcnet/pretrained_models/detection/unbalance/checkpoint_last_run1.pt"
+    # pretrained: "parcnet/pretrained_models/detection/unbalance/checkpoint_best_run1.pt"
     # pretrained: "parcnet/pretrained_models/detection/unbalance/checkpoint_ema_best_run1.pt"
-    pretrained: "parcnet/pretrained_models/detection/balance/checkpoint_last_run1.pt"
+    pretrained: "parcnet/pretrained_models/detection/balance/checkpoint_best_run2.pt"
+    # pretrained: "parcnet/pretrained_models/detection/balance/checkpoint_best_run1.pt"
     # pretrained: "parcnet/pretrained_models/detection/balance/checkpoint_ema_best_run1.pt"
     n_classes: 4
     # pretrained: "parcnet/pretrained_models/detection/checkpoint_ema_avg.pt"

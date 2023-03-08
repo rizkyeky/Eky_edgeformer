@@ -90,6 +90,7 @@ ddp:
   rank: 0
   world_size: -1
   dist_port: 30787
+  use_distributed: True
 stats:
   name: [ "loss" ]
   checkpoint_metric: "loss"
