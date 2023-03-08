@@ -57,16 +57,18 @@ def main(opts, **kwargs):
     # set-up the model
     model = get_model(opts)
 
-    if not str(platform.platform()).startswith('macOS'):
+    if str(platform.system()) != 'Darwin':
         if num_gpus == 0:
             logger.error('Need atleast 1 GPU for training. Got {} GPUs'.format(num_gpus))
-        elif num_gpus == 1:
-            model = model.to(device=device)
         elif is_distributed:
             model = model.to(device=device)
             model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[dev_id], output_device=dev_id)
             if is_master_node:
                 logger.log('Using DistributedDataParallel for training')
+        elif num_gpus == 1:
+            model = model.to(device=device)
+            if is_master_node:
+                logger.log('Using Normal GPU for training')
         else:
             model = torch.nn.DataParallel(model)
             model = model.to(device=device)

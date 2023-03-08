@@ -5,17 +5,17 @@ common:
   log_freq: 500
   auto_resume: true
   mixed_precision: true
-  results_loc: "/content/drive/MyDrive/skripsi/result/detection_krsbi/edgeformer-s"
+  results_loc: "/content/drive/MyDrive/skripsi/result/detection_krsbi/balance"
 dataset:
   root_train: "/content/drive/MyDrive/skripsi/imgs_dec/balance"
   root_val: "/content/drive/MyDrive/skripsi/imgs_dec/balance"
   root_test: "/content/drive/MyDrive/skripsi/imgs_dec/balance"
   name: "krsbi_ssd"
   category: "detection"
-  train_batch_size0: 64
-  val_batch_size0: 64
-  eval_batch_size0: 1
-  workers: 8
+  train_batch_size0: 32
+  val_batch_size0: 32
+  eval_batch_size0: 32
+  workers: -1
   persistent_workers: false
   pin_memory: true
 sampler:
