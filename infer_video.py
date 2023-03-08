@@ -1,7 +1,8 @@
 import cv2
 import main_dec
 import numpy as np
-import multiprocessing as mp
+# import multiprocessing as mp
+import json
 
 def start():
 
@@ -12,6 +13,9 @@ def start():
         print("Error opening video stream or file")
 
     CLASSES = ['_', 'robot', 'ball', 'goal']
+    # with open('labels/ms_coco_81_classes.json') as f:
+    #     CLASSES = json.load(f)
+    #     CLASSES = [CLASSES[str(i)] for i in range(len(CLASSES))]
 
     COLORS = [(0,0,0), (0, 0, 255), (0, 255, 0), (255, 0, 0)]
 
@@ -44,7 +48,7 @@ def start():
             time_diff = (t2 - t1) / cv2.getTickFrequency()
             fps = 1 / time_diff
             fps_list.append(fps)
-            print('{xx:.2f}'.format(np.mean(fps_list)))
+            print('{:.2f}'.format(np.mean(fps_list)))
 
             cv2.putText(orig,'FPS: {:.2f}'.format(fps), (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
 

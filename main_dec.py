@@ -33,11 +33,6 @@ img_transforms = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-img_pil_transforms = transforms.Compose([
-    transforms.Resize((res_h, res_w)),
-    transforms.ToTensor(),
-])
-
 def init_model():    
     model = get_model(opts)
     model.to(device)
@@ -48,39 +43,14 @@ def init_model():
     
     return model
 
-def predict_image_batch(model, batch, _dir):
-
-    images = []
-    for file in batch:
-        image = Image.open(_dir + '/' + file)
-        image = img_pil_transforms(image)
-        image = image.cpu().numpy()
-        images.append(image)
-
-    labels_batch = []
-    scores_batch = []
-    boxes_batch = []
-
-    for i, img in enumerate(images):
-        labels, scores, boxes = predict_image(model, img, is_batch=True)
-        labels_batch.append(labels)
-        scores_batch.append(scores)
-        boxes_batch.append(boxes)
-    
-    return labels_batch, scores_batch, boxes_batch
-
-def predict_image(model, image, is_batch=False):
+def predict_image(model, image):
     
     with torch.no_grad():
         image = np.array(image)
         orig_h, orig_w = image.shape[0], image.shape[1]
         
-        if is_batch:
-            image = torch.from_numpy(image)
-            image = image.unsqueeze(0)
-        else:
-            image = img_transforms(image)
-            image = image.unsqueeze(0)
+        image = img_transforms(image)
+        image = image.unsqueeze(0)
 
         output_stride = 32
         curr_height, curr_width = image.shape[2:]
